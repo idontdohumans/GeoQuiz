@@ -1,6 +1,9 @@
 package com.bignerdranch.android.geoquiz;
 
+import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.app.Activity;
 import android.util.Log;
@@ -33,6 +36,7 @@ public class QuizActivity extends Activity {
 
     private int mCurrentIndex = 0;
 
+    // TODO change data structure (somewhere) to keep track of which questions have been cheated
     private boolean mIsCheater;
 
     private void updateQuestion() {
@@ -58,11 +62,18 @@ public class QuizActivity extends Activity {
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
     }
 
+    @TargetApi(11) //Build option that suppresses Lint errors
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        Log.d(TAG, "onCreate(Bundle) called");
         setContentView(R.layout.activity_quiz);
+
+        // ActionBar breaks under API 11. See above for compiler 'override'
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            ActionBar actionBar = getActionBar();
+            actionBar.setSubtitle("Bodies of Water");
+        }
 
         if (savedInstanceState != null) {
             mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
@@ -164,6 +175,7 @@ public class QuizActivity extends Activity {
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
 //        Log.i(TAG, "onSaveInstanceState");
+        // TODO add mIsCheater to prevent cheaters from cheating after rotate
         savedInstanceState.putInt(KEY_INDEX, mCurrentIndex);
     }
 
